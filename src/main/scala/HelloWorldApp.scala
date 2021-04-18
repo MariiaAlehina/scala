@@ -3,11 +3,109 @@ package alokhina.lab1
 import scala.io.StdIn
 
 object task1 extends App{
-  val name = StdIn.readLine("Hi! Enter your name:")
-  println(s"11111 $name!")
+  // Знак числа дорівнює 1, якщо число позитивне,
+  // -1 - якщо негативне, і 0 - якщо воно дорівнює нулю.
+  // Напишіть функцію, яка обчислює це значення.
+
+  println("Hi! Enter your number:")
+  val x = StdIn.readFloat()
+  val result = if (x > 0) { 1
+  } else if (x == 0) 0 else -1
+  println(result)
 }
 
 object task2 extends App{
-  val name = StdIn.readLine("Hi! Enter your name:")
-  println(s"3333 $name!")
+  // Напишіть цикл for для обчислення добутку кодових
+  // пунктів Юникода всіх букв в рядку.
+
+  val string = StdIn.readLine("Hi! Enter your string:")
+  var result = 1
+  for (i <- string) result *= i.toInt
+
+  println(result)
+}
+
+object task3 extends App{
+  // Вирішіть попередню вправу без застосування циклу.
+
+  val string = StdIn.readLine("Hi! Enter your string:")
+  val result = string.map(_.toInt).product
+
+  println(result)
+}
+
+object task4 extends App{
+  // Напишіть цикл, що міняє місцями суміжні елементи
+  // в масиві цілих чисел. Наприклад, Array (1, 2, 3, 4, 5)
+  // повинен стати Array (2, 1, 4, 3, 5).
+
+}
+
+object task5 extends App{
+  // Повторіть попередню вправу, але створіть новий масив
+  // з переставленими елементами. Використовуйте вираз for / yield.
+
+}
+
+object task6 extends App{
+  // Дан масив цілих чисел, створіть новий масив, в якому
+  // спочатку будуть слідувати позитивні значення з оригінального
+  // масиву, в оригінальному порядку, а за ними негативні
+  // і нульові значення, теж в оригінальному порядку.
+
+}
+
+object task7 extends App{
+  // Напишіть метод, який повертає значення всіх елементів
+  // з масиву, крім повторюваних. Не застосовувати препарат
+  // for. (Підказка: загляньте в Scaladoc.)
+
+}
+
+object task8 extends App{
+  // Створіть колекцію всіх часових поясів, що повертаються
+  // методом java.util.TimeZone.getAvailableIDs. Виберіть елементи
+  // для Америки. Відкиньте префікс "America /" і відсортуйте результат.
+  // Не застосовувати препарат for.
+
+}
+
+object task9 extends App{
+  // Створіть асоціативний масив з цінами на речі,
+  // які ви хотіли б придбати. Потім створіть другий
+  // асоціативний масив з тими ж ключами і цінами з 10% -ою знижкою.
+
+}
+
+object task10 extends App{
+  // Визначте пов'язану хеш-таблицю, яка буде показувати
+  // «Monday» в java.util.Calendar.MONDAY, і так далі для
+  // інших днів тижня. Продемонструйте обхід елементів в порядку їх додавання.
+
+}
+
+object task11 extends App{
+  // Напишіть програму, що читає слова з файлу. Використовуйте
+  // змінюваний асоціативний масив для підрахунку входжень кожного слова.
+
+}
+
+object task12 extends App{
+  // Виконайте попередню вправу, використовуючи сортовані
+  // асоціативний масив Scala, щоб слова виводилися в відсортованому
+  // порядку. І використовуючи java.util.TreeMap,
+  // адаптувавши його для роботи зі Scala API.
+
+}
+
+object task13 extends App{
+  // Виведіть таблицю всіх Java-властивостей, таких як:
+
+}
+
+object task14 extends App{
+  // Напишіть функцію lteqgt (values: Array [Int], v: Int),
+  // що повертає трійку, яка містить лічильник значень
+  // менших v, рівних v і великих v.
+
 }
