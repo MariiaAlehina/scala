@@ -2,77 +2,29 @@ package alokhina.lab1
 
 import alokhina.lab1.task4_8.result
 
-import scala.collection.{mutable}
-import scala.collection.mutable.{ListBuffer}
+import java.io
+import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 import scala.io.Source
-import java.io.{FilterInputStream, InputStream}
+import java.io.{BufferedInputStream, FilterInputStream, InputStream}
 
 object task4_1 extends App{
   // У бібліотеці java.io є можливість додати буферизацию в потік
   // введення за допомогою декоратора BufferedInputStream. Реалізуйте
   // буферизацию як трейт. Для простоти перевизначте метод read
 
-  trait Logger { def log(msg: String): Unit  }
+  trait BufferedInputStreamLike {
+    this: InputStream => val InputStream = new BufferedInputStream(this)
 
-  trait ConsoleLogger extends Logger {
-    override def log(msg: String): Unit = println(msg)
-  }
-
-  trait BufferedInputStreamLike extends InputStream with Logger {
-    val bufferSize = 2048
-    private val buffer = new Array[Byte](bufferSize)
-    private var offset: Int = 0
-    private var size: Int = 0
-
-    abstract override def read(): Int = {
-      if (size == -1) {
-        return -1
-      }
-
-      if (offset >= size) {
-        offset = 0
-        size = 0
-
-        log("Filling the buffer, bufferSize: " + bufferSize)
-        fillBuffer(0)
-
-        if (size == 0) {
-          log("Reached stream end")
-          size = -1
-          return -1
-        }
-
-        log("Buffer is filled, size: " + size)
-      }
-
-      val byte = buffer(offset)
-      offset += 1
-      byte
-    }
-
-    private def fillBuffer(index: Int): Unit = {
-      if (index >= buffer.length) {
-        return
-      }
-
-      val byte = super.read()
-      if (byte == -1) {
-        return
-      }
-
-      buffer(index) = byte.toByte
-      size += 1
-      fillBuffer(index + 1)
+    override def read(ab: Array[Byte]): Int = {
+      InputStream.read(ab)
     }
   }
 
-  val in = new {
-    override val bufferSize = 48
-  } with FilterInputStream(getClass.getResourceAsStream("/myfile.txt"))
-    with BufferedInputStreamLike
-    with ConsoleLogger
-
-//  val result = Source.fromBytes(readBytes(in)).mkString
+  val f_is = new FilterInputStream(getClass.getResourceAsStream("/test_file.txt")) with BufferedInputStreamLike
+  val bytes = new Array[Byte](1 << 4)
+  f_is.read(bytes)
+  bytes.foreach(byte => print(byte.toChar))
 }
 
 object task4_2 extends App{
@@ -84,43 +36,21 @@ object task4_2 extends App{
   class Fraction private(n: Int, d: Int) {
 
     val num: Int = if (d == 0) 1 else n * sign(d) / gcd(n, d)
-
     val den: Int = if (d == 0) 0 else d * sign(d) / gcd(n, d)
 
-    private def sign(a: Int) =
-      if (a > 0) 1
-      else if (a < 0) -1
-      else 0
+    private def sign(a: Int) = if (a > 0) 1 else if (a < 0) -1 else 0
 
-    private def gcd(a: Int, b: Int): Int =
-      if (b == 0) Math.abs(a)
-      else gcd(b, a % b)
+    private def gcd(a: Int, b: Int): Int = if (b == 0) Math.abs(a) else gcd(b, a % b)
 
-    def +(other: Fraction): Fraction = sumOp(other, _ + _)
-
-    def -(other: Fraction): Fraction = sumOp(other, _ - _)
-
+    def +(other: Fraction): Fraction = Fraction(num * other.num + other.num * num, den * other.den)
+    def -(other: Fraction): Fraction = Fraction(num * other.num - other.num * num, den * other.den)
     def *(other: Fraction): Fraction = Fraction(num * other.num, den * other.den)
-
     def /(other: Fraction): Fraction = Fraction(num * other.den, den * other.num)
-
-    private def sumOp(other: Fraction, op: (Int, Int) => Int): Fraction = {
-      Fraction(op(num * other.den, den * other.num), den * other.den)
-    }
 
     override def equals(that: Any): Boolean = that match {
       case that: Fraction => num == that.num && den == that.den
       case _ => false
     }
-
-    override def hashCode: Int = {
-      val prime = 31
-      var result = 1
-      result = prime * result + num
-      result = prime * result + den
-      result
-    }
-
     override def toString = num + "/" + den
   }
 
@@ -144,10 +74,6 @@ object task4_3 extends App{
   // Наприклад, вираз Money (1, 75) + + Money (0, 50) == Money (2, 25) має повертати true.
 
   class Money private(d: Int, c: Int) {
-
-    if (d < 0) throw new IllegalArgumentException("d: " + d)
-    if (c < 0) throw new IllegalArgumentException("c: " + c)
-
     val dollars: Int = if (c > 99) d + (c / 100) else d
     val cents: Int = if (c > 99) c % 100 else c
 
@@ -190,10 +116,7 @@ object task4_4 extends App{
     private val table = new ListBuffer[ListBuffer[String]]
 
     def |(cell: String): Table = {
-      if (table.isEmpty) {
-        table += new ListBuffer[String]
-      }
-
+      if (table.isEmpty) { table += new ListBuffer[String] }
       table.last += cell
       this
     }
@@ -213,7 +136,6 @@ object task4_4 extends App{
           sb ++= cell
           sb ++= "</td>"
         }
-
         sb ++= "</tr>"
       }
 
@@ -344,6 +266,12 @@ object task4_6 extends App{
 object task4_7 extends App{
   // Реалізуйте попереднє завдання використовуючи каррінг та неявний параметр:
   // values(l: Int, h: Int)(implicit f: Int => Int)
+
+  def values(low: Int, high: Int)(implicit fun: Int => Int): Seq[(Int, Int)] = {
+    for (i <- low to high) yield (i, fun(i))
+  }
+
+  println(values(-5, 5)(x => x * x))
 }
 
 object task4_8 extends App{
@@ -353,7 +281,7 @@ object task4_8 extends App{
   // Не використовуйте цикл або рекурсію.
 
   def largest(fun: (Int) => Int, inputs: Seq[Int]): Int = {
-    inputs.map(fun(_)).reduceLeft((a, b) => if (a > b) a else b)
+    inputs.map(fun).max
   }
 
   val result: Int = largest(x => 10 * x - x * x, 1 to 10)
@@ -363,6 +291,12 @@ object task4_8 extends App{
 object task4_9 extends App{
   // Реалізуйте попереднє завдання використовуючи каррінг
   // та неявний параметр: largest (1 to 10)(x => 10 * x - - x * x)
+
+  def largest(inputs: Seq[Int])(implicit fun: (Int) => Int): Int = {
+    inputs.map(fun).max
+  }
+
+  println(largest( 1 to 10)(x => 10 * x - x * x))
 }
 
 object task4_10 extends App{
@@ -377,7 +311,6 @@ object task4_10 extends App{
     for (i <- 0 until s.length) {
       map.getOrElseUpdate(s(i), new mutable.LinkedHashSet[Int]) += i
     }
-
     map
   }
 
@@ -389,4 +322,11 @@ object task4_10 extends App{
 object task4_11 extends App{
   // Напишіть функцію, що видаляє обрані елементи з пов'язаного списку цілих чисел.
   // Функція повинна приймати предикат як другий параметр.
+
+  def removeElements(list: List[Int], p: Int => Boolean): List[Int] = {
+    val inverse = (i: Int) => !p(i)
+    list.filter(inverse)
+  }
+
+  println(removeElements(List(6, 5, 4, 3, 2, 1), x => x % 2== 0))
 }
